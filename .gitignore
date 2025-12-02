@@ -47,3 +47,7 @@ test
 prompt
 
 server.log
+
+# uploaded files
+/public/uploads/*
+!/public/uploads/.gitkeep

@@ -17,8 +17,8 @@ export async function GET(request: NextRequest) {
       whereClause = {
         ...whereClause,
         OR: [
-          { name: { contains: search, mode: 'insensitive' } },
-          { description: { contains: search, mode: 'insensitive' } }
+          { name: { contains: search } },
+          { description: { contains: search } }
         ]
       }
     }
@@ -41,14 +41,26 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
+    console.log('📦 Received product data:', body)
+    
     const { name, description, price, image, category, stock } = body
 
     if (!name || !price || !category) {
+      console.error('❌ Missing required fields:', { name, price, category })
       return NextResponse.json(
-        { error: 'Missing required fields' },
+        { error: 'Missing required fields', details: { name: !!name, price: !!price, category: !!category } },
         { status: 400 }
       )
     }
+
+    console.log('✅ Creating product with data:', {
+      name,
+      description,
+      price: parseFloat(price),
+      image,
+      category,
+      stock: parseInt(stock) || 0
+    })
 
     const product = await db.product.create({
       data: {
@@ -61,11 +73,12 @@ export async function POST(request: NextRequest) {
       }
     })
 
+    console.log('✅ Product created successfully:', product.id)
     return NextResponse.json(product, { status: 201 })
   } catch (error) {
-    console.error('Error creating product:', error)
+    console.error('❌ Error creating product:', error)
     return NextResponse.json(
-      { error: 'Failed to create product' },
+      { error: 'Failed to create product', details: error instanceof Error ? error.message : 'Unknown error' },
       { status: 500 }
     )
   }

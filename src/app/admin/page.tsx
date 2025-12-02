@@ -117,6 +117,34 @@ export default function AdminPage() {
     e.preventDefault()
     
     try {
+      // Upload file first if it's a blob URL
+      let imageUrl = formData.image
+      if (imageUrl && imageUrl.startsWith('blob:')) {
+        console.log('⚠️ Blob URL detected, uploading file...')
+        const fileInput = document.getElementById('imageFile') as HTMLInputElement
+        const file = fileInput?.files?.[0]
+        
+        if (file) {
+          const uploadFormData = new FormData()
+          uploadFormData.append('file', file)
+          
+          const uploadResponse = await fetch('/api/upload', {
+            method: 'POST',
+            body: uploadFormData
+          })
+          
+          if (uploadResponse.ok) {
+            const { url } = await uploadResponse.json()
+            imageUrl = url
+            console.log('✅ File uploaded:', url)
+          } else {
+            console.error('❌ File upload failed')
+            alert('Failed to upload image. Please try using an image URL instead.')
+            return
+          }
+        }
+      }
+      
       const url = editingProduct ? `/api/products/${editingProduct.id}` : '/api/products'
       const method = editingProduct ? 'PUT' : 'POST'
       
@@ -129,7 +157,7 @@ export default function AdminPage() {
           name: formData.name,
           description: formData.description,
           price: parseFloat(formData.price),
-          image: formData.image,
+          image: imageUrl,
           category: formData.category,
           stock: parseInt(formData.stock)
         }),
@@ -139,9 +167,15 @@ export default function AdminPage() {
         await fetchProducts()
         setIsDialogOpen(false)
         resetForm()
+        alert('✅ Product saved successfully!')
+      } else {
+        const errorData = await response.json()
+        console.error('❌ Error response:', errorData)
+        alert(`Failed to save product: ${errorData.error || 'Unknown error'}`)
       }
     } catch (error) {
       console.error('Error saving product:', error)
+      alert('Failed to save product. Check console for details.')
     }
   }
 
