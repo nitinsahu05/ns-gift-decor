@@ -117,34 +117,6 @@ export default function AdminPage() {
     e.preventDefault()
     
     try {
-      // Upload file first if it's a blob URL
-      let imageUrl = formData.image
-      if (imageUrl && imageUrl.startsWith('blob:')) {
-        console.log('⚠️ Blob URL detected, uploading file...')
-        const fileInput = document.getElementById('imageFile') as HTMLInputElement
-        const file = fileInput?.files?.[0]
-        
-        if (file) {
-          const uploadFormData = new FormData()
-          uploadFormData.append('file', file)
-          
-          const uploadResponse = await fetch('/api/upload', {
-            method: 'POST',
-            body: uploadFormData
-          })
-          
-          if (uploadResponse.ok) {
-            const { url } = await uploadResponse.json()
-            imageUrl = url
-            console.log('✅ File uploaded:', url)
-          } else {
-            console.error('❌ File upload failed')
-            alert('Failed to upload image. Please try using an image URL instead.')
-            return
-          }
-        }
-      }
-      
       const url = editingProduct ? `/api/products/${editingProduct.id}` : '/api/products'
       const method = editingProduct ? 'PUT' : 'POST'
       
@@ -157,7 +129,7 @@ export default function AdminPage() {
           name: formData.name,
           description: formData.description,
           price: parseFloat(formData.price),
-          image: imageUrl,
+          image: formData.image,
           category: formData.category,
           stock: parseInt(formData.stock)
         }),
@@ -423,46 +395,26 @@ export default function AdminPage() {
                   </div>
                   
                   <div className="space-y-3">
-                    <Label htmlFor="image">Product Image</Label>
+                    <Label htmlFor="image">Product Image URL</Label>
                     
-                    {/* Image URL Input */}
-                    <div>
-                      <Label htmlFor="imageUrl" className="text-sm text-muted-foreground">Image URL</Label>
-                      <Input
-                        id="imageUrl"
-                        value={formData.image}
-                        onChange={(e) => setFormData({ ...formData, image: e.target.value })}
-                        placeholder="https://example.com/image.jpg"
-                      />
-                    </div>
+                    <Input
+                      id="imageUrl"
+                      value={formData.image}
+                      onChange={(e) => setFormData({ ...formData, image: e.target.value })}
+                      placeholder="https://example.com/image.jpg"
+                      required
+                    />
                     
-                    {/* OR Divider */}
-                    <div className="flex items-center gap-3">
-                      <div className="flex-1 border-t"></div>
-                      <span className="text-sm text-muted-foreground">OR</span>
-                      <div className="flex-1 border-t"></div>
-                    </div>
-                    
-                    {/* File Upload */}
-                    <div>
-                      <Label htmlFor="imageFile" className="text-sm text-muted-foreground">Upload Image File</Label>
-                      <Input
-                        id="imageFile"
-                        type="file"
-                        accept="image/*"
-                        onChange={(e) => {
-                          const file = e.target.files?.[0]
-                          if (file) {
-                            // Create a local URL for preview
-                            const url = URL.createObjectURL(file)
-                            setFormData({ ...formData, image: url })
-                          }
-                        }}
-                        className="cursor-pointer"
-                      />
-                      <p className="text-xs text-muted-foreground mt-1">
-                        Supported: JPG, PNG, GIF, WebP (Max 5MB)
+                    <div className="bg-blue-50 dark:bg-blue-950 border border-blue-200 dark:border-blue-800 rounded-lg p-3">
+                      <p className="text-xs text-blue-800 dark:text-blue-200 font-medium mb-2">
+                        📸 How to get image URL:
                       </p>
+                      <ol className="text-xs text-blue-700 dark:text-blue-300 space-y-1 list-decimal list-inside">
+                        <li>Go to <a href="https://imgbb.com/" target="_blank" rel="noopener noreferrer" className="underline font-medium">ImgBB.com</a></li>
+                        <li>Upload your image</li>
+                        <li>Copy "Direct link"</li>
+                        <li>Paste here</li>
+                      </ol>
                     </div>
                     
                     {/* Image Preview */}
@@ -474,6 +426,9 @@ export default function AdminPage() {
                             src={formData.image}
                             alt="Preview"
                             className="w-full h-full object-cover"
+                            onError={(e) => {
+                              e.currentTarget.src = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="100" height="100"%3E%3Crect fill="%23ddd" width="100" height="100"/%3E%3Ctext fill="%23999" x="50%25" y="50%25" text-anchor="middle" dy=".3em"%3EInvalid URL%3C/text%3E%3C/svg%3E'
+                            }}
                           />
                         </div>
                       </div>
