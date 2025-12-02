@@ -35,6 +35,14 @@ interface Order {
   status: string
   total: number
   createdAt: string
+  customerName?: string
+  customerEmail?: string
+  customerPhone?: string
+  shippingAddress?: string
+  shippingCity?: string
+  shippingState?: string
+  shippingZip?: string
+  shippingCountry?: string
   items: {
     id: string
     quantity: number
@@ -637,13 +645,23 @@ export default function AdminPage() {
                             #{order.id.slice(0, 8)}
                           </TableCell>
                           <TableCell>
-                            <div>
-                              <div className="font-bold">
-                                {order.user.name || order.user.email}
+                            <div className="space-y-1">
+                              <div className="font-bold text-base">
+                                {order.customerName || order.user.name || 'N/A'}
                               </div>
-                              <div className="text-sm text-muted-foreground">
-                                {order.user.email}
+                              <div className="text-sm text-muted-foreground flex items-center gap-1">
+                                📧 {order.customerEmail || order.user.email}
                               </div>
+                              {order.customerPhone && (
+                                <div className="text-sm text-muted-foreground flex items-center gap-1">
+                                  📞 {order.customerPhone}
+                                </div>
+                              )}
+                              {order.shippingAddress && (
+                                <div className="text-xs text-muted-foreground mt-1 p-2 bg-muted/30 rounded">
+                                  📍 {order.shippingAddress}, {order.shippingCity}, {order.shippingState} {order.shippingZip}
+                                </div>
+                              )}
                             </div>
                           </TableCell>
                           <TableCell>

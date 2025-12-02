@@ -30,12 +30,22 @@ export async function POST(request: NextRequest) {
       })
     }
 
-    // Create order
+    // Create order with customer details
     const order = await db.order.create({
       data: {
         userId: DEMO_USER_ID,
         status: 'pending',
-        total
+        total,
+        // Customer Information
+        customerName: `${customerInfo.firstName} ${customerInfo.lastName}`,
+        customerEmail: customerInfo.email,
+        customerPhone: customerInfo.phone,
+        // Shipping Address
+        shippingAddress: shippingAddress.address,
+        shippingCity: shippingAddress.city,
+        shippingState: shippingAddress.state,
+        shippingZip: shippingAddress.zipCode,
+        shippingCountry: shippingAddress.country || 'India'
       }
     })
 

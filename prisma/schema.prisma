@@ -40,12 +40,24 @@ model Product {
 }
 
 model Order {
-  id        String      @id @default(cuid())
-  userId    String
-  status    String      @default("pending")
-  total     Float
-  createdAt DateTime    @default(now())
-  updatedAt DateTime    @updatedAt
+  id              String      @id @default(cuid())
+  userId          String
+  status          String      @default("pending")
+  total           Float
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+  
+  // Customer Information
+  customerName    String?
+  customerEmail   String?
+  customerPhone   String?
+  
+  // Shipping Address
+  shippingAddress String?
+  shippingCity    String?
+  shippingState   String?
+  shippingZip     String?
+  shippingCountry String?
   
   user      User        @relation(fields: [userId], references: [id])
   items     OrderItem[]
