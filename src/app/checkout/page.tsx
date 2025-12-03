@@ -21,6 +21,7 @@ interface CheckoutForm {
   email: string
   firstName: string
   lastName: string
+  phone: string
   
   // Shipping Address
   address: string
@@ -45,11 +46,12 @@ export default function CheckoutPage() {
     email: '',
     firstName: '',
     lastName: '',
+    phone: '',
     address: '',
     city: '',
     state: '',
     zipCode: '',
-    country: 'United States',
+    country: 'India',
     cardNumber: '',
     expiryDate: '',
     cvv: '',
@@ -79,7 +81,8 @@ export default function CheckoutPage() {
             customerInfo: {
               email: form.email,
               firstName: form.firstName,
-              lastName: form.lastName
+              lastName: form.lastName,
+              phone: form.phone
             },
             shippingAddress: {
               address: form.address,
@@ -307,6 +310,20 @@ export default function CheckoutPage() {
                         required
                       />
                     </div>
+                  </div>
+                  <div>
+                    <Label htmlFor="phone">Phone Number</Label>
+                    <Input
+                      id="phone"
+                      type="tel"
+                      placeholder="+91 9876543210"
+                      value={form.phone}
+                      onChange={(e) => handleInputChange('phone', e.target.value)}
+                      required
+                    />
+                    <p className="text-xs text-muted-foreground mt-1">
+                      We'll use this to contact you about your order
+                    </p>
                   </div>
                 </CardContent>
               </Card>
