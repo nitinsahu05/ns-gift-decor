@@ -652,14 +652,16 @@ export default function AdminPage() {
                               <div className="text-sm text-muted-foreground flex items-center gap-1">
                                 📧 {order.customerEmail || order.user.email}
                               </div>
-                              {order.customerPhone && (
-                                <div className="text-sm text-muted-foreground flex items-center gap-1">
-                                  📞 {order.customerPhone}
-                                </div>
-                              )}
-                              {order.shippingAddress && (
+                              <div className="text-sm text-muted-foreground flex items-center gap-1">
+                                📞 {order.customerPhone || <span className="text-xs italic text-muted-foreground/60">Not provided</span>}
+                              </div>
+                              {order.shippingAddress ? (
                                 <div className="text-xs text-muted-foreground mt-1 p-2 bg-muted/30 rounded">
                                   📍 {order.shippingAddress}, {order.shippingCity}, {order.shippingState} {order.shippingZip}
+                                </div>
+                              ) : (
+                                <div className="text-xs italic text-muted-foreground/60 mt-1">
+                                  📍 Address not provided
                                 </div>
                               )}
                             </div>
